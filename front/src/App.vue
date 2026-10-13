@@ -11,6 +11,8 @@ const sellerForm = ref({ id: null, name: '', email: '', active: true })
 const dates = ref({ start: firstDayOfMonth(), end: today() })
 const saleForm = ref({ seller: '', amount: '', sale_date: today(), description: '' })
 
+onMounted(loadData)
+
 function today() {
   return new Date().toISOString().slice(0, 10)
 }
@@ -21,8 +23,21 @@ function firstDayOfMonth() {
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(`${apiUrl}${path}`, { headers: { 'Content-Type': 'application/json' }, ...options })
-  if (!response.ok) throw new Error((await response.json()).detail || 'No se pudo completar la solicitud.')
+  let response
+  try {
+    response = await fetch(`${apiUrl}${path}`, { headers: { 'Content-Type': 'application/json' }, ...options })
+  } catch {
+    throw new Error(`No se pudo conectar con la API: ${apiUrl}`)
+  }
+  if (!response.ok) {
+    let detail = 'No se pudo completar la solicitud.'
+    try {
+      detail = (await response.json()).detail || detail
+    } catch {
+      // La respuesta puede no ser JSON cuando la URL de la API es incorrecta.
+    }
+    throw new Error(detail)
+  }
   return response.json()
 }
 
