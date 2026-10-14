@@ -1,41 +1,85 @@
 # Comisiones por ventas
 
-Aplicación sencilla con Django REST Framework como backend y Vue 3 como frontend.
+Aplicación web para registrar vendedores y ventas, definir reglas de comisión y consultar el total de comisiones por rango de fechas.
 
-## Regla de negocio
+## Tecnologías
 
-Cada vendedor tiene ventas fechadas. Al consultar un rango de fechas, se suman sus ventas dentro del rango y se aplica la regla activa con el mayor umbral que haya alcanzado. La comisión es:
-
-`total vendido × porcentaje de comisión`
-
-Ejemplo: si alcanza $20 y existe una regla del 5%, recibe el 5% de su total vendido en el periodo.
+- **Backend:** Python, Django y Django REST Framework.
+- **Frontend:** Vue 3 y Vite.
+- **Base de datos:** SQLite en local y PostgreSQL en producción.
+- **Despliegue:** Render para el backend y Netlify para el frontend.
 
 ## Estructura
 
 ```text
-back/   API Django REST + SQLite por defecto
-front/  Vue 3 + Vite
+back/   API REST y lógica de negocio
+front/  Interfaz web Vue
 ```
 
-## Ejecución local
+## Aplicación desplegada
 
-### Backend
+- **Frontend:** https://co-misiones.netlify.app/
+- **Backend/API:** https://co-misiones.onrender.com/api/
+- **API de vendedores:** https://co-misiones.onrender.com/api/sellers/
+- **API de reglas:** https://co-misiones.onrender.com/api/rules/
+
+## Video de explicación
+
+**Enlace al video de YouTube:** https://youtu.be/pp2LdbkwVLw
+
+```text
+PENDIENTE: agregar aquí el enlace del video
+```
+
+## Ejecutar localmente
+
+### 1. Backend
+
+Desde la raíz del proyecto:
 
 ```bash
 cd back
 python -m venv .venv
-source .venv/bin/activate       # Windows: .venv\Scripts\activate
+```
+
+Activar el entorno virtual.
+
+Linux/macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Instalar dependencias y preparar la base de datos:
+
+```bash
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py seed_demo
 python manage.py runserver
 ```
 
-API disponible en `http://127.0.0.1:8000/api/`.
+El backend estará disponible en:
 
-### Frontend
+```text
+http://127.0.0.1:8000
+```
 
-En otra terminal:
+La API estará disponible en:
+
+```text
+http://127.0.0.1:8000/api/
+```
+
+### 2. Frontend
+
+Abrir otra terminal y ejecutar:
 
 ```bash
 cd front
@@ -43,23 +87,44 @@ npm install
 npm run dev
 ```
 
-El frontend usa `VITE_API_URL=http://127.0.0.1:8000/api` por defecto. Para producción se puede crear `front/.env.production` con la URL pública del backend.
+El frontend estará disponible en:
 
-## Endpoints
+```text
+http://localhost:5173
+```
 
-- `GET/POST /api/sellers/`
-- `GET/POST /api/sales/`
-- `GET/POST /api/rules/`
-- `GET /api/commission-summary/?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD`
+El frontend utiliza por defecto esta API:
 
-También existen `PUT/PATCH/DELETE` para los recursos individuales.
+```text
+http://127.0.0.1:8000/api
+```
 
-## Despliegue recomendado en Azure
+Para usar otra dirección, crear `front/.env.local`:
 
-- Backend: Azure App Service para Python + PostgreSQL Flexible Server.
-- Frontend: Azure Static Web Apps conectado al repositorio.
-- Configurar en backend `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, `DJANGO_ALLOWED_HOSTS` y `DATABASE_URL`.
-- Configurar en frontend `VITE_API_URL` con la URL del App Service.
-- Ejecutar migraciones durante el despliegue: `python manage.py migrate`.
+```text
+VITE_API_URL=http://127.0.0.1:8000/api
+```
 
-El backend incluye `back/Procfile` y `back/runtime.txt` para App Service/servicios compatibles.
+## Funcionamiento
+
+1. Se registra un vendedor.
+2. Se registra una o varias ventas con fecha y monto.
+3. Se crean reglas con un umbral y un porcentaje.
+4. Se selecciona un rango de fechas.
+5. El backend suma las ventas de cada vendedor dentro del rango.
+6. Se aplica la regla activa más alta que el vendedor haya alcanzado.
+7. La comisión se calcula así:
+
+```text
+total vendido × porcentaje / 100
+```
+
+## Endpoints principales
+
+```text
+GET/POST   /api/sellers/
+GET/PATCH/DELETE /api/sellers/{id}/
+GET/POST   /api/sales/
+GET/POST   /api/rules/
+GET /api/commission-summary/?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
+```
