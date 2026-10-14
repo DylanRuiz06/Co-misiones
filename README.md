@@ -27,9 +27,6 @@ front/  Interfaz web Vue
 
 **Enlace al video de YouTube:** https://youtu.be/pp2LdbkwVLw
 
-```text
-PENDIENTE: agregar aquí el enlace del video
-```
 
 ## Ejecutar localmente
 
